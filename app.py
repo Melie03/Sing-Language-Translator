@@ -85,7 +85,7 @@ while capture.isOpened():
         # cut array of right hand
         right_hand = image[min_y:max_y, min_x:max_x,:]
         # convert to gray
-        right_hand = cv2.cvtColor(right_hand, cv2.COLOR_BGR2GRAY)
+        right_hand = cv2.cvtColor(right_hand, cv2.COLOR_RGB2GRAY)
 
     # Drawing Left hand Land Marks
     mp_drawing.draw_landmarks(
@@ -112,7 +112,7 @@ while capture.isOpened():
         # cut array of left hand    
         left_hand = image[min_y:max_y, min_x:max_x,:]
         # convert to gray
-        left_hand = cv2.cvtColor(left_hand, cv2.COLOR_BGR2GRAY)
+        left_hand = cv2.cvtColor(left_hand, cv2.COLOR_RGB2GRAY)
 	
     # Calculating the FPS
     currentTime = time.time()
