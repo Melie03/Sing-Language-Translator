@@ -62,23 +62,20 @@ model.add(Dense(128,activation ="relu"))
 #model.add(Dropout(0.2))
 model.add(Dense(128,activation ="relu"))
 #model.add(Dropout(0.3))
+model.add(Dense(128,activation ="relu"))
+#model.add(Dropout(0.4))
 model.add(Dense(27,activation ="softmax"))
 
 
-model.compile(optimizer=Adam(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=1, min_lr=0.0001)
+model.compile(optimizer=Adam(learning_rate=0.01), loss='categorical_crossentropy', metrics=['accuracy'])
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=1, min_lr=0.000001)
 early_stop = EarlyStopping(monitor='val_loss', min_delta=0, patience=2, verbose=0, mode='auto')
 
-
-model.compile(optimizer=SGD(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=1, min_lr=0.0005)
-#early_stop = EarlyStopping(monitor='val_loss', min_delta=0, patience=2, verbose=0, mode='auto')
-
-history2 = model.fit(train_batches, epochs=10, callbacks=[reduce_lr, early_stop],  validation_data = test_batches)#, checkpoint])
-imgs, labels = next(train_batches) # For getting next batch of imgs...
+history2 = model.fit(train_batches, epochs=10, callbacks=[reduce_lr],  validation_data = test_batches)#, checkpoint])
 
 imgs, labels = next(test_batches) # For getting next batch of imgs...
 scores = model.evaluate(imgs, labels, verbose=0)
+print(scores)
 print(f'{model.metrics_names[0]} of {scores[0]}; {model.metrics_names[1]} of {scores[1]*100}%')
 
 #model.save('best_model_dataflair.h5')
