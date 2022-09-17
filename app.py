@@ -4,6 +4,8 @@ import warnings
 import time
 import cv2
 import mediapipe as mp
+import keras
+import numpy as np
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -26,6 +28,37 @@ capture = cv2.VideoCapture(0)
 previousTime = 0
 currentTime = 0
 
+model = keras.models.load_model(r"/Users/atounsi/Documents/GitHub/Sing-Language-Translator/Training/model/best_model_dataflair3.h5")
+
+label_dict = { 
+    0:'A',
+    1:'B',
+    2:'C',
+    3:'D',
+    4:'E',
+    5:'F',
+    6:'G',
+    7:'H',
+    8:'I',
+    9:'J',
+    10:'K',
+    11:'L',
+    12:'M',
+    13:'N',
+    14:'O',
+    15:'P',
+    16:'Q',
+    17:'R',
+    18:'S',
+    19:'T',
+    20:'U',
+    21:'V',
+    22:'W',
+    23:'X',
+    24:'Y',
+    25:'Z',
+    26:'Blank'
+}
 while capture.isOpened():
     # capture frame by frame
     ret, frame = capture.read()
@@ -84,8 +117,23 @@ while capture.isOpened():
 
         # cut array of right hand
         right_hand = image[min_y:max_y, min_x:max_x,:]
+        # resize array of right hand
+        right_hand = cv2.resize(right_hand, (64,64))
         # convert to gray
-        right_hand = cv2.cvtColor(right_hand, cv2.COLOR_RGB2GRAY)
+
+        predictions_right_hand = model.predict(np.expand_dims(right_hand, axis=0), verbose=0)
+
+        idx_sign_right_hand = np.argmax(predictions_right_hand[0])
+        print(idx_sign_right_hand, predictions_right_hand[0][idx_sign_right_hand])
+
+        cv2.putText(img=image, 
+                    text=f"{label_dict[idx_sign_right_hand]} : {predictions_right_hand[0][idx_sign_right_hand]*100:.2f}",
+                    org=(min_x,min_y),
+                    fontFace=cv2.FONT_HERSHEY_TRIPLEX, 
+                    fontScale=3,
+                    color=(255, 255, 255),
+                    thickness=3)
+
 
     # Drawing Left hand Land Marks
     mp_drawing.draw_landmarks(
@@ -111,8 +159,23 @@ while capture.isOpened():
 
         # cut array of left hand    
         left_hand = image[min_y:max_y, min_x:max_x,:]
+        # resize array of left hand
+        left_hand = cv2.resize(left_hand, (64,64))
         # convert to gray
-        left_hand = cv2.cvtColor(left_hand, cv2.COLOR_RGB2GRAY)
+
+        predictions_left_hand = model.predict(np.expand_dims(left_hand, axis=0), verbose=0)
+
+        idx_sign_left_hand = np.argmax(predictions_left_hand[0])
+        print(idx_sign_left_hand,predictions_left_hand[0][idx_sign_left_hand])
+
+        cv2.putText(img=image,
+                    text=f"{label_dict[idx_sign_left_hand]} : {predictions_left_hand[0][idx_sign_left_hand]*100:.2f}",
+                    org=(min_x,min_y),
+                    fontFace=cv2.FONT_HERSHEY_TRIPLEX, 
+                    fontScale=2,
+                    color=(255, 255, 255),
+                    thickness=3)
+
 	
     # Calculating the FPS
     currentTime = time.time()
